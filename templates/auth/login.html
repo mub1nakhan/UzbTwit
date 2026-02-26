@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Login | UzTwit{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+        <h2>Tizimga Kirish</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Parol" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Hisobingiz yo‘qmi?
+            <a href="{% url 'register' %}">Ro‘yxatdan o‘tish</a>
+        </p>
+    </div>
+
+</div>
+
+<style>
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+.auth-card {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    border-radius: 20px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.auth-card h2 {
+    margin-bottom: 20px;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 30px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+.auth-card button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 30px;
+    border: none;
+    background: #3a86ff;
+    color: white;
+    font-weight: 600;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.auth-card button:hover {
+    background: #265df2;
+}
+
+.auth-card a {
+    color: #3a86ff;
+    text-decoration: none;
+}
+
+.error {
+    background: #ffdddd;
+    color: #a00;
+    padding: 8px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+</style>
+
+{% endblock %}

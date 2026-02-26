@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Home | UzTwit{% endblock %}
+
+{% block content %}
+
+<div class="grid">
+
+    <!-- LEFT SIDE -->
+    <div>
+
+        {% if user.is_authenticated %}
+        <div class="card">
+            <form method="POST">
+                {% csrf_token %}
+                <textarea name="body" placeholder="Nimalar bo‘ldi?..." 
+                style="width:100%; border:none; outline:none; resize:none; font-size:15px;"></textarea>
+
+                <div style="text-align:right; margin-top:10px;">
+                    <button class="btn-primary">Post</button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="card" style="text-align:center;">
+            <h3>Post yozish uchun tizimga kiring</h3>
+            <br>
+            <a href="{% url 'login' %}" class="btn-primary">Login</a>
+        </div>
+        {% endif %}
+
+        <!-- POSTS -->
+        {% for post in posts %}
+        <div class="card">
+
+            <div style="display:flex; align-items:center; gap:10px;">
+                <img src="{{ post.author.profile.avatar.url }}" width="40" height="40" 
+                     style="border-radius:50%; object-fit:cover;">
+                <strong>@{{ post.author.username }}</strong>
+            </div>
+
+            <p style="margin:15px 0;">{{ post.body }}</p>
+
+            <div style="display:flex; gap:20px; color:gray;">
+                <span><i class="bi bi-heart"></i> {{ post.likes_count }}</span>
+                <span><i class="bi bi-chat"></i> {{ post.comments_count }}</span>
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="card">
+            <p>Hozircha postlar yo‘q...</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+    <div>
+
+        <div class="card">
+            <h4>Find Friends & Posts</h4>
+            <input type="text" placeholder="Search..." 
+                   style="width:100%; padding:8px; border-radius:20px; border:1px solid #ddd; margin-top:10px;">
+        </div>
+
+        <div class="card">
+            <h4>Suggested Users</h4>
+
+            {% for u in users %}
+            <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                <img src="{{ u.profile.avatar.url }}" width="35" height="35" 
+                     style="border-radius:50%;">
+                <span>@{{ u.username }}</span>
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

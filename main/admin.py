@@ -28,3 +28,5 @@ class PostAdmin(admin.ModelAdmin):
     
     def get_comments_count(self, obj):
         return obj.comments_count()
+    
+    

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | UzTwit{% endblock %}
+
+{% block extra_css %}
+<style>
+    .post-card {
+        padding: 30px;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+    }
+
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .post-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #3a86ff;
+    }
+
+    .post-meta {
+        font-size: 14px;
+        color: #888;
+    }
+
+    .post-body {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .like-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #3a86ff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .unlike-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f0f0f0;
+        color: #ee1f1f;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .like-btn:hover {
+        background: #265df2;
+    }
+
+    .comments-section {
+        margin-top: 40px;
+    }
+
+    .comment-card {
+        background: #f7f9fc;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+
+    .comment-author {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #3a86ff;
+    }
+
+    .comment-body {
+        font-size: 15px;
+        color: #333;
+    }
+
+    .comment-form textarea {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        resize: none;
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    .comment-form button {
+        float: right;
+        background: #3a86ff;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .comment-form button:hover {
+        background: #265df2;
+    }
+
+    .auth-warning {
+        color: #ff4d4d;
+        font-style: italic;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="post-card">
+    <div class="post-header">
+        <div class="post-title">{{ post.title }}</div>
+        <div class="post-meta">
+            By {{ post.author.username }} | {{ post.created_at|date:"F j, Y, H:i" }}
+        </div>
+    </div>
+    <div class="post-body">
+        {{ post.body }}
+    </div>
+
+    {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'like_post' %}">
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <button type="submit" class="{% if is_liked %} unlike-btn {% else %}like-btn{% endif %}">
+                <i class="bi bi-hand-thumbs-up"></i> {% if is_liked %} Unliked {% else %} Liked {% endif %}({{ post.likes.count }})
+            </button>
+        </form>
+    {% else %}
+        <p class="auth-warning">Login to like this post ❤️</p>
+    {% endif %}
+</div>
+
+<div class="comments-section">
+    <h3>Comments ({{ post.comments.count }})</h3>
+
+    {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'comment_create' %}" class="comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <textarea name="body" rows="3" placeholder="Write your comment..." required></textarea>
+            <button type="submit">Post Comment</button>
+        </form>
+    {% else %}
+        <p class="auth-warning">Login to comment on this post 💬</p>
+    {% endif %}
+
+    <div class="comments-list">
+        {% for comment in comments %}
+            <div class="comment-card">
+                <div class="comment-author">{{ comment.author.username }}</div>
+                <div class="comment-body">{{ comment.body }}</div>
+            </div>
+        {% empty %}
+            <p>No comments yet. Be the first to comment! 🌟</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

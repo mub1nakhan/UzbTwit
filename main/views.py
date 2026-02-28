@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from .models import Post
+from .models import Post, Comment
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -28,6 +29,28 @@ def home(request):
         "posts": posts,
         "users": users
     })
+    
+    
+    
+
+def about_developer(request):
+    context = {
+        "name": "Mubinaxon Gafurovna",
+        "profession": "Python & Dart",
+        "experience": "3 oy+ tajriba",
+        "description": "Men zamonaviy web ilovalar, REST API va to‘liq backend tizimlar yaratish bilan shug‘ullanaman. Django, PostgreSQL va API integratsiyalar bilan ishlayman. Maqsadim — xavfsiz, tezkor va foydalanuvchi uchun qulay platformalar yaratish.",
+        
+        "phone": "+998 91 234 56 78",
+        "email": "mub1nakhano22@gmail.com",
+        "telegram": "@programiistt",
+        "instagram": "@mub1nakhan.o6",
+        "github": "github.com/mub1nakhan",
+        
+        "location": "Toshkent, O'zbekiston"
+    }
+
+    return render(request, 'about.html', context)
+   
     
 
 def login_view(request):
@@ -82,3 +105,68 @@ def register_view(request):
         
         
     return render(request,"auth/register.html")
+
+
+def post_detail_view(request,pk):
+    post = get_object_or_404(Post, id=pk)
+    comments = post.comments.all().order_by("-created_at")
+    is_liked = False
+    if request.user.is_authenticated:
+        user = request.user
+        
+        is_liked = post.likes.filter(id=user.id).exists()
+    
+    context = {
+        "post": post,
+        "comments": comments,
+        "is_liked": is_liked
+    }
+    
+    return render(request,"post_detail.html",context)
+
+@login_required(login_url="login/")
+def comment_create(request):
+    user = request.user
+    
+    if request.method == "POST":
+        parent = request.POST.get("parent", None)
+        body = request.POST.get("body")
+        post_id = request.POST.get("post_id")
+        
+        post = get_object_or_404(Post, id=post_id)
+        
+        comment = Comment.objects.create(
+            author=user,
+            body=body,
+            parent=parent,
+            post=post
+        )
+        messages.success(request, "Comment succesfully created!")
+        print("comment yaratildi:", comment)
+        return redirect("post_detail", post_id)
+    
+
+@login_required
+def like_post_view(request):
+    user = request.user
+    
+    if request.method == "POST":
+        
+        post_id = request.POST.get("post_id")
+        post = get_object_or_404(Post, id=post_id)
+        
+        if post.likes.filter(id=user.id).exists():
+            post.likes.remove(user)
+        else:
+            post.likes.add(user)
+            post.save()
+        
+        messages.success(request, "Liked post")
+        return redirect("post_detail", post_id)
+    
+def profile_view(request, username):
+    user = get_object_or_404(User, username=username)
+    context = {
+        "user": user
+    }
+    return render(request,"user_profile.html", context)

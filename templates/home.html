@@ -33,12 +33,23 @@
         <div class="card">
 
             <div style="display:flex; align-items:center; gap:10px;">
-                <img src="{{ post.author.profile.avatar.url }}" width="40" height="40" 
-                     style="border-radius:50%; object-fit:cover;">
-                <strong>@{{ post.author.username }}</strong>
+                <a href="#">
+                    <img src="{{ post.author.profile.avatar.url }}" width="40" height="40" 
+                         style="border-radius:50%; object-fit:cover;">
+                </a>
+                <strong>
+                    <a href="{% url 'profile_view' post.author.username %}" style="text-decoration:none; color:#333;">
+                        @{{ post.author.username }}
+                    </a>
+                </strong>
             </div>
 
-            <p style="margin:15px 0;">{{ post.body }}</p>
+            <!-- Post body linking to post detail -->
+            <p style="margin:15px 0;">
+                <a href="{% url 'post_detail' post.id %}" style="text-decoration:none; color:#444;">
+                    {{ post.body|truncatechars:150 }}
+                </a>
+            </p>
 
             <div style="display:flex; gap:20px; color:gray;">
                 <span><i class="bi bi-heart"></i> {{ post.likes_count }}</span>
@@ -69,9 +80,13 @@
 
             {% for u in users %}
             <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
-                <img src="{{ u.profile.avatar.url }}" width="35" height="35" 
-                     style="border-radius:50%;">
-                <span>@{{ u.username }}</span>
+                <a href="#">
+                    <img src="{{ u.profile.avatar.url }}" width="35" height="35" 
+                         style="border-radius:50%;">
+                </a>
+                <a href="{% url 'profile_view' u.username %}" style="text-decoration:none; color:#333;">
+                    @{{ u.username }}
+                </a>
             </div>
             {% endfor %}
 

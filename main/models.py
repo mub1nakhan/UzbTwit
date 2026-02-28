@@ -9,6 +9,8 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return self.user.username
+        
+
     
 class Post(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE, related_name="posts")
@@ -27,6 +29,9 @@ class Post(models.Model):
     
     def comments_count(self):
         return self.comments.count()
+    
+    class Meta:
+        ordering = ["-created_at"]
     
 
 class Comment(models.Model):
